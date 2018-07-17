@@ -22,6 +22,14 @@
     <url>https://github.com/rcarz/jira-client</url>
     <connection>https://github.com/rcarz/jira-client</connection>
   </scm>
+  
+  <distributionManagement>
+    <repository>
+      <id>bintray-apodhrad</id>
+      <name>jira-client</name>
+      <url>https://api.bintray.com/maven/qetools/maven/jira-client</url>
+    </repository>
+  </distributionManagement>
 
   <developers>
     <developer>
@@ -36,6 +44,11 @@
     <artifactId>oss-parent</artifactId>
     <version>7</version>
   </parent>
+
+  <properties>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
 
   <dependencies>
 
@@ -93,4 +106,39 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <additionalOptions>
+             <additionalOption>-Xdoclint:none</additionalOption>
+          </additionalOptions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
