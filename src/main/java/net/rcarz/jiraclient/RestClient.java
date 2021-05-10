@@ -53,6 +53,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 /**
  * A simple REST client that speaks JSON.
@@ -148,8 +149,10 @@ public class RestClient {
     	        }
             }
             
-            InputStreamReader isr =  encoding != null ?
-                new InputStreamReader(ent.getContent(), encoding) :
+            InputStreamReader isr =
+                encoding != null ?
+                    "gzip".equals(encoding) ? new InputStreamReader(new GZIPInputStream(ent.getContent())) :
+                    new InputStreamReader(ent.getContent(), encoding) :
                 new InputStreamReader(ent.getContent());
             BufferedReader br = new BufferedReader(isr);
             String line = "";
