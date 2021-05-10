@@ -3,7 +3,7 @@
 
   <groupId>net.rcarz</groupId>
   <artifactId>jira-client</artifactId>
-  <version>0.6.qetools-SNAPSHOT</version>
+  <version>0.6.qetools-2</version>
   <packaging>jar</packaging>
 
   <name>jira-client</name>
@@ -22,13 +22,18 @@
     <url>https://github.com/rcarz/jira-client</url>
     <connection>https://github.com/rcarz/jira-client</connection>
   </scm>
-  
+
   <distributionManagement>
     <repository>
-      <id>bintray-apodhrad</id>
-      <name>jira-client</name>
-      <url>https://api.bintray.com/maven/qetools/maven/jira-client</url>
+      <id>jboss-releases-repository</id>
+      <name>JBoss Releases Repository</name>
+      <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2</url>
     </repository>
+    <snapshotRepository>
+      <id>jboss-snapshots-repository</id>
+      <name>JBoss Snapshots Repository</name>
+      <url>https://repository.jboss.org/nexus/content/repositories/snapshots</url>
+    </snapshotRepository>
   </distributionManagement>
 
   <developers>
