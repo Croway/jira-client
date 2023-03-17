@@ -859,20 +859,41 @@ public class Issue extends Resource {
 
     public static JSONObject getCreateMetadata(
         RestClient restclient, String project, String issueType) throws JiraException {
-
-        final String pval = project;
-        final String itval = issueType;
         JSON result = null;
 
         try {
-            Map<String, String> params = new HashMap<String, String>();
-            params.put("expand", "projects.issuetypes.fields");
-            params.put("projectKeys", pval);
-            params.put("issuetypeNames", itval);
             URI createuri = restclient.buildURI(
-                getBaseUri() + "issue/createmeta",
-                params);
+                    getBaseUri() + "issue/createmeta/" + project + "/issuetypes");
+
             result = restclient.get(createuri);
+
+            JSONObject object = (JSONObject) result;
+            object.names();
+            JSONArray values = (JSONArray) object.get("values");
+
+            if (values == null) {
+                throw new JiraException("Failed to retrieve issue metadata, values object is null");
+            }
+
+            String issueTypeId = null;
+            ListIterator<JSONObject> iterator = values.listIterator();
+            while (iterator.hasNext()) {
+                JSONObject obj = iterator.next();
+
+                if (issueType.equals(obj.get("name"))) {
+                    issueTypeId = (String) obj.get("id");
+                    break;
+                }
+            }
+
+            if (issueTypeId == null) {
+                throw new JiraException("Failed to retrieve issue metadata, issue type " + issueType + " not found in project " + project);
+            }
+
+            URI issueTypeUri = restclient.buildURI(
+                    getBaseUri() + "issue/createmeta/" + project + "/issuetypes/" + issueTypeId);
+
+            result = restclient.get(issueTypeUri);
         } catch (Exception ex) {
             throw new JiraException("Failed to retrieve issue metadata", ex);
         }
@@ -882,20 +903,15 @@ public class Issue extends Resource {
 
         JSONObject jo = (JSONObject)result;
 
-        if (jo.isNullObject() || !jo.containsKey("projects") ||
-                !(jo.get("projects") instanceof JSONArray))
-            throw new JiraException("Create metadata is malformed");
+        JSONObject jsonObject = new JSONObject();
+        ListIterator<JSONObject> iterator = ((JSONArray) jo.get("values")).listIterator();
+        while (iterator.hasNext()) {
+            JSONObject obj = iterator.next();
 
-        List<Project> projects = Field.getResourceArray(
-            Project.class,
-            (JSONArray)jo.get("projects"),
-            restclient);
+            jsonObject.put(obj.get("fieldId"), obj);
+        }
 
-        if (projects.isEmpty() || projects.get(0).getIssueTypes().isEmpty())
-            throw new JiraException("Project '"+ project + "'  or issue type '" + issueType +
-                    "' missing from create metadata. Do you have enough permissions?");
-
-        return projects.get(0).getIssueTypes().get(0).getFields();
+        return jsonObject;
     }
 
     private JSONObject getEditMetadata() throws JiraException {
